@@ -7,116 +7,6 @@
 //
 
 
-
-//*****************************
-
-
-//import UIKit
-//import CoreLocation
-//class ViewController: UIViewController, CLLocationManagerDelegate {
-//
-//    var locationManager:CLLocationManager!
-//
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        // Do any additional setup after loading the view, typically from a nib.
-//    }
-//
-//    override func didReceiveMemoryWarning() {
-//        super.didReceiveMemoryWarning()
-//        // Dispose of any resources that can be recreated.
-//    }
-//
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//
-//        determineMyCurrentLocation()
-//    }
-//
-//
-//    func determineMyCurrentLocation() {
-//        locationManager = CLLocationManager()
-//        locationManager.delegate = self
-//        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-//        locationManager.requestAlwaysAuthorization()
-//
-//        if CLLocationManager.locationServicesEnabled() {
-//            locationManager.startUpdatingLocation()
-//            //locationManager.startUpdatingHeading()
-//        }
-//    }
-//
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        let userLocation:CLLocation = locations[0] as CLLocation
-//
-//        // Call stopUpdatingLocation() to stop listening for location updates,
-//        // other wise this function will be called every time when user location changes.
-//
-//       // manager.stopUpdatingLocation()
-//
-//
-//
-//print("shiran")
-//        print("user latitude = \(userLocation.coordinate.latitude)")
-//        print("user longitude = \(userLocation.coordinate.longitude)")
-//    }
-//
-//    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
-//    {
-//        print("Error \(error)")
-//    }
-//}
-
-//************* see user location on map *****************
-
-//import UIKit
-//import MapKit
-//
-//class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
-//
-//
-//    @IBOutlet weak var mapView: MKMapView!
-//    let locationManager = CLLocationManager()
-//
-//    override func viewDidLoad() {
-//    super.viewDidLoad()
-//
-//    self.locationManager.requestAlwaysAuthorization()
-//    self.locationManager.requestWhenInUseAuthorization()
-//
-//    if CLLocationManager.locationServicesEnabled() {
-//        locationManager.delegate = self
-//        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-//        locationManager.startUpdatingLocation()
-//    }
-//    mapView.delegate = self
-//    mapView.mapType = .standard
-//    mapView.isZoomEnabled = true
-//    mapView.isScrollEnabled = true
-//
-//    if let coor = mapView.userLocation.location?.coordinate{
-//        mapView.setCenter(coor, animated: true)
-//    }
-//
-//}
-//
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations
-//        locations: [CLLocation]) {
-//        let locValue:CLLocationCoordinate2D = manager.location!.coordinate
-//
-//        mapView.mapType = MKMapType.standard
-//
-//        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-//        let region = MKCoordinateRegion(center: locValue, span: span)
-//        mapView.setRegion(region, animated: true)
-//
-//        let annotation = MKPointAnnotation()
-//        annotation.coordinate = locValue
-//        annotation.title = "You are Here"
-//        mapView.addAnnotation(annotation)
-//    }
-//}
-
 //*************** see user cordination ***************
 
 import UIKit
@@ -127,28 +17,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var labelLat: UILabel!
     @IBOutlet weak var labelLongi: UILabel!
-    @IBOutlet weak var labelAdd: UILabel!
 
-    
     var locationManager:CLLocationManager!
     
     
-       override func viewDidLoad() {
+    override func viewDidLoad() {
     super.viewDidLoad()
     locationManager = CLLocationManager()
        locationManager.delegate = self
       //  locationManager.desiredAccuracy = kCLLocationAccuracyBest
        locationManager.requestAlwaysAuthorization()
         
-      
-        //בדיקה-הוספה עבור התראות..........
-//        UIApplication.shared.cancelAllLocalNotifications()
-//  //סוף בדיקה............
-      
         if CLLocationManager.locationServicesEnabled(){
            locationManager.startUpdatingLocation()
        }
-        
         
     }
     
@@ -194,25 +76,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         var currentLoc: CLLocation!
         currentLoc = locationManager.location
 
-        
         let latitude = currentLoc.coordinate.latitude
         let longitude = currentLoc.coordinate.longitude
 
         let appleURL = "http://maps.apple.com/?ll=\(latitude),\(longitude)"
-        let googleURL = "comgooglemaps://?ll=\(latitude),\(longitude)"
-        let wazeURL = "waze://?ll=\(latitude),\(longitude)&navigate=false"
-
-        let googleItem = ("Google Map", URL(string:googleURL)!)
-        let wazeItem = ("Waze", URL(string:wazeURL)!)
+        
+        // optipns for more navigations apps:
+//        let googleURL = "comgooglemaps://?ll=\(latitude),\(longitude)"
+//        let wazeURL = "waze://?ll=\(latitude),\(longitude)&navigate=false"
+//
+//        let googleItem = ("Google Map", URL(string:googleURL)!)
+//        let wazeItem = ("Waze", URL(string:wazeURL)!)
+        
         var installedNavigationApps = [("Apple Maps", URL(string:appleURL)!)]
 
-        if UIApplication.shared.canOpenURL(googleItem.1) {
-            installedNavigationApps.append(googleItem)
-        }
-
-        if UIApplication.shared.canOpenURL(wazeItem.1) {
-            installedNavigationApps.append(wazeItem)
-        }
+//        if UIApplication.shared.canOpenURL(googleItem.1) {
+//            installedNavigationApps.append(googleItem)
+//            print("mami2")
+//        }
+//
+//        if UIApplication.shared.canOpenURL(wazeItem.1) {
+//            installedNavigationApps.append(wazeItem)
+//            print("mami")
+//        }
 
         let alert = UIAlertController(title: "Selection", message: "Select Navigation App", preferredStyle: .actionSheet)
         for app in installedNavigationApps {
@@ -224,17 +110,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alert.addAction(cancel)
         present(alert, animated: true)
+     
     }
     
     
-    //*************** notification when app close ***************
+    //*************** notification ***************
   
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         print("Authorized status changed")
         if CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedAlways || CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedWhenInUse {
             let circularRegion = CLCircularRegion.init(center: CLLocationCoordinate2DMake(32.03046, 34.79795),
-                                                       radius: 100.0,
-                                                       identifier: "ituran")
+                                                       radius: 100.0, identifier: "ברוך הבא לאיתוראן!")
             circularRegion.notifyOnEntry = true
             circularRegion.notifyOnExit = false
             locationManager.startMonitoring(for: circularRegion)
@@ -242,14 +128,33 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        if UIApplication.shared.applicationState == .active {
+        print("Did Arrive2: \(region.identifier)")
+        firePopup(notificationText: "\(region.identifier)", didEnter: true)
+        } else {
+        print("Did Arrive: \(region.identifier)")
+         fireNotification(notificationText: "\(region.identifier)", didEnter: true)
+        }
+    }
+    
+//    func startMySignificantLocationChanges() {
+//        if !CLLocationManager.significantLocationChangeMonitoringAvailable() {
+//            // The device does not support this service.
+//            return
+//        }
+//        locationManager.startMonitoringSignificantLocationChanges()
+//    }
+    
+    // *********** when the app is closed ***************
     func fireNotification(notificationText: String, didEnter: Bool) {
         let notificationCenter = UNUserNotificationCenter.current()
         
         notificationCenter.getNotificationSettings { (settings) in
             if settings.alertSetting == .enabled {
                 let content = UNMutableNotificationContent()
-                content.title = "ituran notification"
-                content.body = notificationText
+                content.title = notificationText
+                //content.body = notificationText
                 content.sound = UNNotificationSound.default
                 
                 let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
@@ -265,9 +170,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        print("Did Arrive: \(region.identifier)")
-        fireNotification(notificationText: "\(region.identifier)", didEnter: true)
+    // ************** when the app is open ****************
+    
+    func firePopup(notificationText: String, didEnter: Bool) {
+        let alert = UIAlertController(title: notificationText, message:"", preferredStyle: .alert)
+        let cancel = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+               alert.addAction(cancel)
+               present(alert, animated: true)
+     
+        
     }
 
 }
