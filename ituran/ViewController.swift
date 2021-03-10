@@ -121,6 +121,7 @@
 
 import UIKit
 import CoreLocation
+import UserNotifications
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
@@ -136,14 +137,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     super.viewDidLoad()
     locationManager = CLLocationManager()
        locationManager.delegate = self
-       locationManager.desiredAccuracy = kCLLocationAccuracyBest
+      //  locationManager.desiredAccuracy = kCLLocationAccuracyBest
        locationManager.requestAlwaysAuthorization()
-
-       if CLLocationManager.locationServicesEnabled(){
+        
+      
+        //בדיקה-הוספה עבור התראות..........
+//        UIApplication.shared.cancelAllLocalNotifications()
+//  //סוף בדיקה............
+      
+        if CLLocationManager.locationServicesEnabled(){
            locationManager.startUpdatingLocation()
        }
         
-     
+        
     }
     
     //MARK: - location delegate methods
@@ -155,25 +161,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
         self.labelLat.text = "\(userLocation.coordinate.latitude)"
         self.labelLongi.text = "\(userLocation.coordinate.longitude)"
+
+//        let geocoder = CLGeocoder()
+//        geocoder.reverseGeocodeLocation(userLocation) { (placemarks, error) in
+//            if (error != nil){
+//                print("error in reverseGeocode")
+//            }
         
-//        let url = "http://maps.apple.com/maps?saddr=\(userLocation.coordinate.latitude),\(userLocation.coordinate.longitude)"
-//          UIApplication.shared.openURL(URL(string:url)!)
-
-        let geocoder = CLGeocoder()
-        geocoder.reverseGeocodeLocation(userLocation) { (placemarks, error) in
-            if (error != nil){
-                print("error in reverseGeocode")
-            }
-            let placemark = placemarks! as [CLPlacemark]
-            if placemark.count>0{
-                let placemark = placemarks![0]
-                print(placemark.locality!)
-                print(placemark.administrativeArea!)
-                print(placemark.country!)
-
-                self.labelAdd.text = "\(placemark.locality!), \(placemark.administrativeArea!), \(placemark.country!)"
-            }
-        }
+//            let placemark = placemarks! as [CLPlacemark]
+//            if placemark.count>0{
+//                let placemark = placemarks![0]
+//                print(placemark.locality!)
+//                print(placemark.administrativeArea!)
+//                print(placemark.country!)
+//
+//                self.labelAdd.text = "\(placemark.locality!), \(placemark.administrativeArea!), \(placemark.country!)"
+//        }
+//      }
+        
 
     }
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -181,7 +186,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
  
-    
+//    ********* move to maps app on iphone ***********
     
     @IBAction func openMap(_ sender: Any) {
     
@@ -221,4 +226,48 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         present(alert, animated: true)
     }
     
+    
+    //*************** notification when app close ***************
+  
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        print("Authorized status changed")
+        if CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedAlways || CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedWhenInUse {
+            let circularRegion = CLCircularRegion.init(center: CLLocationCoordinate2DMake(32.03046, 34.79795),
+                                                       radius: 100.0,
+                                                       identifier: "ituran")
+            circularRegion.notifyOnEntry = true
+            circularRegion.notifyOnExit = false
+            locationManager.startMonitoring(for: circularRegion)
+           
+        }
+    }
+    
+    func fireNotification(notificationText: String, didEnter: Bool) {
+        let notificationCenter = UNUserNotificationCenter.current()
+        
+        notificationCenter.getNotificationSettings { (settings) in
+            if settings.alertSetting == .enabled {
+                let content = UNMutableNotificationContent()
+                content.title = "ituran notification"
+                content.body = notificationText
+                content.sound = UNNotificationSound.default
+                
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                
+                let request = UNNotificationRequest(identifier: "Test", content: content, trigger: trigger)
+                
+                notificationCenter.add(request, withCompletionHandler: { (error) in
+                    if error != nil {
+                        // Handle the error
+                    }
+                })
+            }
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        print("Did Arrive: \(region.identifier)")
+        fireNotification(notificationText: "\(region.identifier)", didEnter: true)
+    }
+
 }
