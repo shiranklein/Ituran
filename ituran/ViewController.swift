@@ -43,6 +43,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
         self.labelLat.text = "\(userLocation.coordinate.latitude)"
         self.labelLongi.text = "\(userLocation.coordinate.longitude)"
+        
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -90,8 +91,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             circularRegion.notifyOnEntry = true
             circularRegion.notifyOnExit = false
             locationManager.startMonitoring(for: circularRegion)
+            userLocationIsInRegionWhenAppOpened()
         }
-        userLocationIsInRegionWhenAppOpened()
     }
     
     //********** if user enter the region => fire the notification/popup ************
@@ -115,9 +116,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 content.sound = UNNotificationSound.default
                 
                 let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-                let request = UNNotificationRequest(identifier: "Test", content: content, trigger: trigger)
+                let request = UNNotificationRequest(identifier: "error", content: content, trigger: trigger)
                 notificationCenter.add(request, withCompletionHandler: { (error) in
                     if error != nil {
+                        print("error in notification")
                     }
                 })
             }
